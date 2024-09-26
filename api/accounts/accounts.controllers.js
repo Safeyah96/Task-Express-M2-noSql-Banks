@@ -1,46 +1,62 @@
-let accounts = require('../../accounts');
+const accounts = require("../../data");
 
-exports.accountCreate = (req, res) => {
-  const id = accounts[accounts.length - 1].id + 1;
-  const newAccount = { ...req.body, funds: 0, id };
-  accounts.push(newAccount);
-  res.status(201).json(newAccount);
+const getAllAccounts = (request, response) => {
+  return response.status(200).json({ accounts: accounts });
 };
 
-exports.accountDelete = (req, res) => {
-  const { accountId } = req.params;
-  const foundAccount = accounts.find((account) => account.id === +accountId);
-  if (foundAccount) {
-    accounts = accounts.filter((account) => account.id !== +accountId);
-    res.status(204).end();
+const createAccount = (request, response) => {
+  let length = accounts.length;
+  const newID = accounts[length - 1].id + 1;
+  const newAccount = {
+    id: newID,
+    username: request.body.username,
+    funds: req.body.funds,
+  };
+  console.log("new account", newAccount);
+};
+accounts.push(newAccount);
+return response.status(201).json({ accounts: accounts });
+
+const getOneAccount = (request, response) => {
+  const { id } = request.params;
+  const account = accounts.find((account) => {
+    if (account.id == id) return true;
+  });
+  if (!account) {
+    return response.status(404).jsons({ error: "Account Not Found" });
   } else {
-    res.status(404).json({ message: 'Account not found' });
+    return response.status(200).jsons({ accounts: accounts });
   }
 };
 
-exports.accountUpdate = (req, res) => {
-  const { accountId } = req.params;
-  const foundAccount = accounts.find((account) => account.id === +accountId);
-  if (foundAccount) {
-    foundAccount.funds = req.body.funds;
-    res.status(204).end();
-  } else {
-    res.status(404).json({ message: 'Account not found' });
-  }
+const deleteOneAccount = (request, response) => {
+  const { id } = request.params;
+
+  const updatedAccounts = accounts.filter((account) => {
+    if (account.id != id) {
+      return true;
+    }
+  });
+  return response.status(200).json({ accounts: updatedAccounts });
 };
 
-exports.accountsGet = (req, res) => {
-  res.json(accounts);
+const updateAccount = (request, response) => {
+  const { id } = request.params;
+
+  const accountFound = accounts.find((account) => {
+    if (account.id == id) {
+      return true;
+    }
+  });
+  accountFound.accountNumber = request.body.accountNumber;
+
+  return response.status(200).json({ accounts: accountFound });
 };
 
-exports.getAccountByUsername = (req, res) => {
-  const { username } = req.params;
-  const foundAccount = accounts.find(
-    (account) => account.username === username
-  );
-  if (req.query.currency === 'usd') {
-    const accountInUsd = { ...foundAccount, funds: foundAccount.funds * 3.31 };
-    res.status(201).json(accountInUsd);
-  }
-  res.status(201).json(foundAccount);
+module.exports = {
+  getAllAccounts,
+  createAccount,
+  getOneAccount,
+  deleteOneAccount,
+  updateAcount,
 };

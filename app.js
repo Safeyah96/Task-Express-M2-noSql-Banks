@@ -1,11 +1,11 @@
-let accounts = require('./accounts');
-const express = require('express');
+const express = require("express");
+const accountRouter = require("./api/accounts/accounts.routes");
+const PORT = 8000;
 const app = express();
-const accountsRoutes = require('./api/accounts/accounts.routes');
 
 app.use(express.json());
-app.use('/accounts', accountsRoutes);
+app.use("/api", accountRouter);
 
-app.listen(8000, () => {
-  console.log('The application is running on localhost:8000');
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
